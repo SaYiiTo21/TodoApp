@@ -1,0 +1,90 @@
+@startuml
+class MainApp {
+    -controller: MainController
+}
+
+class MainController {
+    - taskList: List<Task>
+    - storage: TaskStorage
+    + loadTasks(): void
+    + saveTasks(): void
+    + refreshUI(): void
+    + onAddButtonClick(): void
+    + onRemoveButtonClick(): void
+}
+
+abstract class Task {
+    #titre: String
+    #description: String
+    #repetable: boolean
+    #importance: Importance
+    #done: boolean
+    #date: LocalDate
+    + is_Task_Done(): void
+    + modify_task(): void
+}
+
+class BasicTask {
+    + is_Task_Done(): void
+    + modify_task(): void
+}
+
+class RepetableTask {
+    + is_Task_Done(): void
+    + modify_task(): void
+    + repeateToNextDay(): void
+}
+
+enum Importance {
+    VERY_LOW
+    LOW
+    MEDIUM
+    HIGH
+    HIGHEST
+}
+
+class TaskFormDialog {
+    + creationOfTask(): void
+}
+
+class TaskStorage {
+    - filePath: String
+    + save(tasks: List<Task>): void
+    + load(): List<Task>
+}
+
+interface Button {
+    + handleAction(): void
+}
+
+class ButtonAdd {
+    + add_Task_To_List(): void
+    + handleAction(): void
+}
+
+class ButtonRemove {
+    + remove_Task_From_list(): void
+    + handleAction(): void
+}
+
+' Relations
+MainApp *-- MainController
+
+MainController *-- Button
+MainController *-- TaskStorage
+MainController o-- Task
+
+Button <|-- ButtonAdd
+Button <|-- ButtonRemove
+
+Task <|-- BasicTask
+Task <|-- RepetableTask
+Task --> Importance : use
+
+ButtonAdd ..> TaskFormDialog : use
+TaskFormDialog ..> Task : create
+ButtonRemove ..> Task : delete
+
+TaskStorage ..> Task : persist
+
+@enduml
